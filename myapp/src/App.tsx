@@ -1,3 +1,9 @@
+class Person {
+  name!: string;
+  age!: number;
+  isTeacher!: boolean;
+}
+
 function App() {
   let isTeacher: boolean = true;
   const name: string = "Rob";
@@ -6,7 +12,7 @@ function App() {
   let colors: string[] = ["red", "orange", "purple"];
 
   let student = new Person();
- 
+
   student.name = name;
   student.age = age;
   student.isTeacher = isTeacher;
@@ -31,8 +37,8 @@ function App() {
     message = "Loop";
     isActive = false;
   }
-  
-  let loops : number = 0;
+
+  let loops: number = 0;
   for (; loops < 3;) {
     loops = loops + 1;
   }
@@ -44,17 +50,22 @@ function App() {
 
   let product: number = Multiply(8, 7);
 
-  return printScore("70");
+  return (
+    <div>
+      <div>
+      <label>Name: </label>
+      <input></input>
+    </div>
+    <div>
+      <button>Submit</button>
+      </div>
+    </div>
+
+  );
 }
 
-class Person {
-  name!: string;
-  age!: number;
-  isTeacher!: boolean;
-  }
-
 function Multiply(number1: number, number2: number): number {
-    return number1 * number2;
+  return number1 * number2;
 }
 
 function printScore(parameter: string): string {
@@ -71,4 +82,4 @@ function printScore(parameter: string): string {
   }
 }
 
-export default App
+export default App;
