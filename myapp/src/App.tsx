@@ -1,3 +1,4 @@
+export default App;
 class Person {
   name!: string;
   age!: number;
@@ -5,11 +6,35 @@ class Person {
 }
 
 function App() {
+   return (
+    <form onSubmit={submitButtonOnClick}>
+      <div>
+      <label>Name:</label>
+      <input id="name" required></input>
+    </div>
+    <div>
+      <label>Age:</label>
+      <input id="age" type="number" min="0" max="120" required></input>
+    </div>
+    <div>
+      <button type="submit">Submit</button>
+      </div>
+    </form>
+    )
+
+    function submitButtonOnClick() {
+      let userInputName = document.querySelector<HTMLInputElement>("#name")!;
+      let userInputAge = document.querySelector<HTMLInputElement>("#age")!;
+     
+
+      if (userInputName && userInputAge) { {
+        alert("Name:  " + userInputName.value + " Age:  " + userInputAge.value);
+           }
+    }
+}
   let isTeacher: boolean = true;
   const name: string = "Rob";
   let age: number = 39;
-
-  let colors: string[] = ["red", "orange", "purple"];
 
   let student = new Person();
 
@@ -50,19 +75,6 @@ function App() {
 
   let product: number = Multiply(8, 7);
 
-  return (
-    <div>
-      <div>
-      <label>Name: </label>
-      <input></input>
-    </div>
-    <div>
-      <button>Submit</button>
-      </div>
-    </div>
-
-  );
-}
 
 function Multiply(number1: number, number2: number): number {
   return number1 * number2;
@@ -81,5 +93,4 @@ function printScore(parameter: string): string {
     return String(error);
   }
 }
-
-export default App;
+}
