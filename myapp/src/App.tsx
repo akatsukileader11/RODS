@@ -1,96 +1,153 @@
+//Library Imports
+import csvText from "./data.csv?raw"; //Raw CSV data file
+import Papa from "papaparse"; //External library used for reading CSVs
+import { useState } from "react"; //State allows us to update UI when data changes
+import "./App.css"; //Use our style file
+
+//Web App's Default Page
+function App() {
+  //Store the contents of the CSV
+  let csvArray : any[] = Papa.parse(
+    csvText,
+    {header: true, skipEmptyLines: true}
+  ).data;
+
+  //Fill the contents of the CSV into a table variable
+  let people: Person[] = [];
+
+  //Loop once for each data row in the CSV file
+  for (let loop: number = 0; loop < csvArray.length; loop++) {
+    //Store the contents of the current row
+    let row = csvArray[loop];
+
+    //Convert the row's contents into a Person object
+    let person = new Person();
+    person.name = row.name;
+    person.age = row.age;
+    person.isTeacher = Boolean(Number(row.isTeacher));
+   
+    //Add the Person object into the People array
+    people.push(person);
+  }
+
+  //Search by name
+  let findRob = people.find(p => p.name === "Rob")!;
+
+  // Find Teachers (Is Teacher = Yes)
+  let teachers = people.filter(p => Boolean(Number(p.isTeacher)));
+
+  //Filter by Names with the letter O
+  let oNames = people.filter(p => p.name.toLowerCase().includes("o"));
+
+  //Create a new State Variable that stores the selected person's name
+  //setSelectedName is the built-in function that updates the variable
+  //"Rob" is the default value
+  let [selectedName, setSelectedName] = useState("Rob");
+
+  //Event Handler when the People drop down gets a different selected name
+  function handleNameChange(event: React.ChangeEvent<HTMLSelectElement>) {
+    //Update the selectedName State Variable
+    setSelectedName(event.target.value);
+  }
+
+  //Display the Name and Age input in a pop up
+  function Display() {
+    let name = document.querySelector<HTMLInputElement>("#name");
+    let age = document.querySelector<HTMLInputElement>("#age");
+
+    if (name && age) {
+        alert("Name: " + name.value + " - Age: " + age.value);
+    }
+  }
+
+  //UI
+  return (
+    <form onSubmit={Display}>
+      {
+      // Return a form as the main component of the web app
+      // Run the Display function when two things happen:
+      // 1. The Submit button is pushed
+      // 2. All the form's validation rules are met
+      }
+      <div>
+        <label>Name: </label>
+        <input id="name"></input>
+      </div>
+      <div>
+        <label>Age:</label>
+        <input id="age" type="number" min="0" max="100" required></input>
+      </div>
+      <br />
+      <div>
+        <button type="submit">Submit</button>
+      </div>
+      <br />
+      <div>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Age</th>
+              <th>Is Teacher</th>
+            </tr>
+          </thead>
+
+          <tbody>
+           
+            {//Display the contents of the People array in a new table
+            people.map((person, loop) => (
+              <tr key={loop}>
+                <td>{person.name}</td>
+                <td>{person.age}</td>
+                <td>{person.isTeacher ? "Yes" : "No"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <br />
+      <div>
+            <label>Search by name results: </label>{findRob.age}
+      </div>
+      <div>
+            <label>Number of teachers: </label>{teachers.length}
+      </div>
+      <div>
+            <label>Number of names with the letter O: </label>{oNames.length}
+      </div>
+      <br />
+       <div>
+          <label>People: </label>
+          {
+          // Create a new drop down connected to our State Variable and event handler
+          }
+          <select id="name"
+          value={selectedName}
+          onChange={handleNameChange}
+          >
+            {//Map the Names in the People array to the select dropdown
+            people.map(p => (
+              <option key={p.name}
+                  value={p.name}>
+                  {p.name}
+              </option>
+            ))}
+          </select>
+      </div>
+       <div>
+            <label>Selected Age: </label>{people.find(p => p.name === selectedName)?.age}
+      </div>
+      <div>
+            <label>Selected Is Teacher: </label>{people.find(p => p.name === selectedName)?.isTeacher ? "Yes" : "No"}
+      </div>
+    </form>
+  )
+}
+
 export default App;
+
 class Person {
   name!: string;
   age!: number;
   isTeacher!: boolean;
-}
-
-function App() {
-   return (
-    <form onSubmit={submitButtonOnClick}>
-      <div>
-      <label>Name:</label>
-      <input id="name" required></input>
-    </div>
-    <div>
-      <label>Age:</label>
-      <input id="age" type="number" min="0" max="120" required></input>
-    </div>
-    <div>
-      <button type="submit">Submit</button>
-      </div>
-    </form>
-    )
-
-    function submitButtonOnClick() {
-      let userInputName = document.querySelector<HTMLInputElement>("#name")!;
-      let userInputAge = document.querySelector<HTMLInputElement>("#age")!;
-     
-
-      if (userInputName && userInputAge) { {
-        alert("Name:  " + userInputName.value + " Age:  " + userInputAge.value);
-           }
-    }
-}
-  let isTeacher: boolean = true;
-  const name: string = "Rob";
-  let age: number = 39;
-
-  let student = new Person();
-
-  student.name = name;
-  student.age = age;
-  student.isTeacher = isTeacher;
-
-  let people: Person[] = [
-    { name: "rob", age: 39, isTeacher: true },
-    { name: "jane", age: 28, isTeacher: false },
-    { name: "Sam", age: 42, isTeacher: false }
-  ];
-  let message: string = "Start";
-
-  let score: number = 70;
-  if (score >= 60) {
-    message = "You passed!";
-  } else {
-    message = "You failed!";
-  }
-
-  let isActive: boolean = true;
-
-  while (isActive) {
-    message = "Loop";
-    isActive = false;
-  }
-
-  let loops: number = 0;
-  for (; loops < 3;) {
-    loops = loops + 1;
-  }
-
-  //Loop #1 - start --> Loops = 0, 0 < 3 = true, end --> loops = 1
-  //Loop #2 - start --> Loops = 1, 1 < 3 = true, end --> loops = 2
-  //Loop #3 - start --> Loops = 2, 2 < 3 = true, end --> loops = 3
-  //Loop #4 - start --> Loops = 3, 3 < 3 = false, end --> loops = 3
-
-  let product: number = Multiply(8, 7);
-
-
-function Multiply(number1: number, number2: number): number {
-  return number1 * number2;
-}
-
-function printScore(parameter: string): string {
-  try {
-    let score: number = Number(parameter);
-
-    if (isNaN(score)) {
-      throw new Error("not a number!");
-    }
-
-    return String(score);
-  } catch (error) {
-    return String(error);
-  }
-}
 }
