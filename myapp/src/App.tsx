@@ -37,7 +37,7 @@ function App() {
   let teachers = people.filter(p => Boolean(Number(p.isTeacher)));
 
   //Filter by Names with the letter O
-  let oNames = people.filter(p => p.name.toLowerCase().includes("o"));
+  let oNames = people.filter(p => p.name?.toLowerCase().includes("a"));
 
   //Create a new State Variable that stores the selected person's name
   //setSelectedName is the built-in function that updates the variable
@@ -56,7 +56,7 @@ function App() {
     let age = document.querySelector<HTMLInputElement>("#age");
 
     if (name && age) {
-        alert("Name: " + name.value + " - Age: " + age.value);
+        alert("Name: " + name.value + "  age: " + age.value);
     }
   }
 
