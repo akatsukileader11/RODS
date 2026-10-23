@@ -1,6 +1,6 @@
-Label { color: purple;
-}
-form { background-color: navy;}
+label { color: darkred; }
+
+form { background-color: #FFD166;}
 
 button {
   color: white;
@@ -8,7 +8,7 @@ button {
 }
 
 button.hover {
-  background: orange 
+  background: black 
 }
 
 input:focus-visible,
@@ -29,6 +29,6 @@ input,select {
 table {
   width: 100%}
   th, td {
-    border: 1px solid gray;
+    border: 3px solid rgb(0, 0, 0);
     text-align: center;
 }
