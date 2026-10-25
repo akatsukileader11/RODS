@@ -73,7 +73,7 @@ function App() {
         <button type="submit">Search</button>
       </div>
       <br />
-      <div>
+      <div className="table-container">
         <table>
           <thead>
             <tr>
