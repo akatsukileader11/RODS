@@ -52,18 +52,35 @@ function App() {
 		gameEntry.boxArtImageUrl = imageUrlsByGame.get(gameEntry.identifier) ?? "";
 		return gameEntry;
 	});
-	const [name, setName] = useState("");
+	const [searchType, setSearchType] = useState("name");
+	const [searchQuery, setSearchQuery] = useState("");
 	const [visibleGames, setVisibleGames] = useState(games);
 	const [suggestionsOpen, setSuggestionsOpen] = useState(false);
-	const matchingNames = [...new Set(games.map((game) => game.name).filter(Boolean))].sort((first, second) => first.localeCompare(second, void 0, { sensitivity: "base" })).filter((gameName) => gameName.toLowerCase().includes(name.trim().toLowerCase()));
+	const [searchSubmitted, setSearchSubmitted] = useState(false);
+	const gameNames = [...new Set(games.map((game) => game.name).filter(Boolean))].sort((first, second) => first.localeCompare(second, void 0, { sensitivity: "base" }));
+	const genres = [...new Set(games.map((game) => game.genre).filter(Boolean))].sort((first, second) => first.localeCompare(second, void 0, { sensitivity: "base" }));
+	const suggestions = (searchType === "name" ? gameNames : genres).filter((value) => value.toLowerCase().includes(searchQuery.trim().toLowerCase()));
 	function Display(event) {
 		event.preventDefault();
-		const searchTerms = name.toLowerCase().match(/[a-z0-9]+/g) ?? [];
-		setVisibleGames(games.filter((game) => {
-			const gameNameWords = new Set(game.name.toLowerCase().match(/[a-z0-9]+/g) ?? []);
-			return searchTerms.every((term) => gameNameWords.has(term));
-		}));
+		if (searchType === "genre") {
+			const genreQuery = searchQuery.trim().toLowerCase();
+			setVisibleGames(games.filter((game) => game.genre.toLowerCase().includes(genreQuery)).sort((first, second) => first.genre.localeCompare(second.genre, void 0, { sensitivity: "base" }) || first.name.localeCompare(second.name, void 0, { sensitivity: "base" })));
+		} else {
+			const searchTerms = searchQuery.toLowerCase().match(/[a-z0-9]+/g) ?? [];
+			setVisibleGames(games.filter((game) => {
+				const gameNameWords = new Set(game.name.toLowerCase().match(/[a-z0-9]+/g) ?? []);
+				return searchTerms.every((term) => gameNameWords.has(term));
+			}).sort((first, second) => first.name.localeCompare(second.name, void 0, { sensitivity: "base" })));
+		}
 		setSuggestionsOpen(false);
+		setSearchSubmitted(true);
+	}
+	function clearSubmittedSearch() {
+		if (searchSubmitted) {
+			setSearchQuery("");
+			setSearchSubmitted(false);
+		}
+		setSuggestionsOpen(true);
 	}
 	return /* @__PURE__ */ jsxs("form", {
 		onSubmit: Display,
@@ -73,24 +90,47 @@ function App() {
 				src: GameDex_app_logo_default,
 				alt: "GameDex logo"
 			}),
-			/* @__PURE__ */ jsxs("div", {
+			/* @__PURE__ */ jsx("div", {
 				className: "search-controls",
-				children: [
-					/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-						htmlFor: "name",
-						children: "Search games by name: "
-					}), /* @__PURE__ */ jsxs("div", {
+				children: /* @__PURE__ */ jsxs("div", { children: [
+					/* @__PURE__ */ jsx("label", {
+						htmlFor: "search-type",
+						children: "Search games by: "
+					}),
+					/* @__PURE__ */ jsxs("select", {
+						id: "search-type",
+						value: searchType,
+						onChange: (event) => {
+							setSearchType(event.target.value === "genre" ? "genre" : "name");
+							setSearchQuery("");
+							setSearchSubmitted(false);
+							setSuggestionsOpen(false);
+						},
+						children: [/* @__PURE__ */ jsx("option", {
+							value: "name",
+							children: "Name"
+						}), /* @__PURE__ */ jsx("option", {
+							value: "genre",
+							children: "Genre"
+						})]
+					}),
+					/* @__PURE__ */ jsx("label", {
+						htmlFor: "search-query",
+						children: searchType === "name" ? "Game name: " : "Genre: "
+					}),
+					/* @__PURE__ */ jsxs("div", {
 						className: "search-input-container",
 						children: [/* @__PURE__ */ jsx("input", {
-							id: "name",
-							value: name,
+							id: "search-query",
+							value: searchQuery,
 							autoComplete: "off",
 							"aria-autocomplete": "list",
-							"aria-controls": "game-name-suggestions",
+							"aria-controls": "search-suggestions",
 							"aria-expanded": suggestionsOpen,
-							onFocus: () => setSuggestionsOpen(true),
+							onFocus: clearSubmittedSearch,
+							onClick: clearSubmittedSearch,
 							onChange: (event) => {
-								setName(event.target.value);
+								setSearchQuery(event.target.value);
 								setSuggestionsOpen(true);
 							},
 							onKeyDown: (event) => {
@@ -101,27 +141,26 @@ function App() {
 							},
 							onBlur: () => setSuggestionsOpen(false)
 						}), suggestionsOpen && /* @__PURE__ */ jsx("div", {
-							id: "game-name-suggestions",
+							id: "search-suggestions",
 							className: "suggestion-list",
 							role: "listbox",
-							children: matchingNames.length > 0 ? matchingNames.map((gameName) => /* @__PURE__ */ jsx("button", {
+							children: suggestions.length > 0 ? suggestions.map((suggestion) => /* @__PURE__ */ jsx("button", {
 								type: "button",
 								className: "suggestion-option",
 								role: "option",
 								"aria-selected": false,
 								onMouseDown: (event) => event.preventDefault(),
 								onClick: () => {
-									setName(gameName);
+									setSearchQuery(suggestion);
 									setSuggestionsOpen(false);
 								},
-								children: gameName
-							}, gameName)) : /* @__PURE__ */ jsx("div", {
+								children: suggestion
+							}, suggestion)) : /* @__PURE__ */ jsxs("div", {
 								className: "no-suggestions",
-								children: "No matching games"
+								children: ["No matching ", searchType === "name" ? "games" : "genres"]
 							})
 						})]
-					})] }),
-					/* @__PURE__ */ jsx("br", {}),
+					}),
 					/* @__PURE__ */ jsx("div", {
 						className: "search-button-container",
 						children: /* @__PURE__ */ jsx("button", {
@@ -130,7 +169,7 @@ function App() {
 							children: "Search"
 						})
 					})
-				]
+				] })
 			}),
 			/* @__PURE__ */ jsx("br", {}),
 			/* @__PURE__ */ jsx("div", {

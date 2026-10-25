@@ -57,26 +57,53 @@ function App() {
     return gameEntry;
   });
 
-  const [name, setName] = useState("");
+  const [searchType, setSearchType] = useState<"name" | "genre">("name");
+  const [searchQuery, setSearchQuery] = useState("");
   const [visibleGames, setVisibleGames] = useState(games);
   const [suggestionsOpen, setSuggestionsOpen] = useState(false);
+  const [searchSubmitted, setSearchSubmitted] = useState(false);
 
   const gameNames = [...new Set(games.map((game) => game.name).filter(Boolean))]
     .sort((first, second) => first.localeCompare(second, undefined, { sensitivity: "base" }));
-  const matchingNames = gameNames.filter((gameName) =>
-    gameName.toLowerCase().includes(name.trim().toLowerCase())
+  const genres = [...new Set(games.map((game) => game.genre).filter(Boolean))]
+    .sort((first, second) => first.localeCompare(second, undefined, { sensitivity: "base" }));
+  const suggestions = (searchType === "name" ? gameNames : genres).filter((value) =>
+    value.toLowerCase().includes(searchQuery.trim().toLowerCase())
   );
 
   function Display(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
-    const searchTerms = name.toLowerCase().match(/[a-z0-9]+/g) ?? [];
-    setVisibleGames(
-      games.filter((game) => {
-        const gameNameWords = new Set(game.name.toLowerCase().match(/[a-z0-9]+/g) ?? []);
-        return searchTerms.every((term) => gameNameWords.has(term));
-      })
-    );
+    if (searchType === "genre") {
+      const genreQuery = searchQuery.trim().toLowerCase();
+      setVisibleGames(
+        games
+          .filter((game) => game.genre.toLowerCase().includes(genreQuery))
+          .sort((first, second) =>
+            first.genre.localeCompare(second.genre, undefined, { sensitivity: "base" }) ||
+            first.name.localeCompare(second.name, undefined, { sensitivity: "base" })
+          )
+      );
+    } else {
+      const searchTerms = searchQuery.toLowerCase().match(/[a-z0-9]+/g) ?? [];
+      setVisibleGames(
+        games.filter((game) => {
+          const gameNameWords = new Set(game.name.toLowerCase().match(/[a-z0-9]+/g) ?? []);
+          return searchTerms.every((term) => gameNameWords.has(term));
+        }).sort((first, second) =>
+          first.name.localeCompare(second.name, undefined, { sensitivity: "base" })
+        )
+      );
+    }
     setSuggestionsOpen(false);
+    setSearchSubmitted(true);
+  }
+
+  function clearSubmittedSearch(): void {
+    if (searchSubmitted) {
+      setSearchQuery("");
+      setSearchSubmitted(false);
+    }
+    setSuggestionsOpen(true);
   }
 
   //UI
@@ -85,18 +112,35 @@ function App() {
       <img className="app-logo" src={gameDexLogo} alt="GameDex logo" />
       <div className="search-controls">
         <div>
-          <label htmlFor="name">Search games by name: </label>
+          <label htmlFor="search-type">Search games by: </label>
+          <select
+            id="search-type"
+            value={searchType}
+            onChange={(event) => {
+              setSearchType(event.target.value === "genre" ? "genre" : "name");
+              setSearchQuery("");
+              setSearchSubmitted(false);
+              setSuggestionsOpen(false);
+            }}
+          >
+            <option value="name">Name</option>
+            <option value="genre">Genre</option>
+          </select>
+          <label htmlFor="search-query">
+            {searchType === "name" ? "Game name: " : "Genre: "}
+          </label>
           <div className="search-input-container">
             <input
-              id="name"
-              value={name}
+              id="search-query"
+              value={searchQuery}
               autoComplete="off"
               aria-autocomplete="list"
-              aria-controls="game-name-suggestions"
+              aria-controls="search-suggestions"
               aria-expanded={suggestionsOpen}
-              onFocus={() => setSuggestionsOpen(true)}
+              onFocus={clearSubmittedSearch}
+              onClick={clearSubmittedSearch}
               onChange={(event) => {
-                setName(event.target.value);
+                setSearchQuery(event.target.value);
                 setSuggestionsOpen(true);
               }}
               onKeyDown={(event) => {
@@ -108,34 +152,35 @@ function App() {
               onBlur={() => setSuggestionsOpen(false)}
             />
             {suggestionsOpen && (
-              <div id="game-name-suggestions" className="suggestion-list" role="listbox">
-                {matchingNames.length > 0 ? (
-                  matchingNames.map((gameName) => (
+              <div id="search-suggestions" className="suggestion-list" role="listbox">
+                {suggestions.length > 0 ? (
+                  suggestions.map((suggestion) => (
                     <button
-                      key={gameName}
+                      key={suggestion}
                       type="button"
                       className="suggestion-option"
                       role="option"
                       aria-selected={false}
                       onMouseDown={(event) => event.preventDefault()}
                       onClick={() => {
-                        setName(gameName);
+                        setSearchQuery(suggestion);
                         setSuggestionsOpen(false);
                       }}
                     >
-                      {gameName}
+                      {suggestion}
                     </button>
                   ))
                 ) : (
-                  <div className="no-suggestions">No matching games</div>
+                  <div className="no-suggestions">
+                    No matching {searchType === "name" ? "games" : "genres"}
+                  </div>
                 )}
               </div>
             )}
           </div>
-        </div>
-        <br />
-        <div className="search-button-container">
-          <button className="search-submit" type="submit">Search</button>
+          <div className="search-button-container">
+            <button className="search-submit" type="submit">Search</button>
+          </div>
         </div>
       </div>
       <br />

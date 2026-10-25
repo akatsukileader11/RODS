@@ -26,7 +26,7 @@ input,select {
   border-radius: 10px;
 }
 
-#name {
+#search-query {
   font-size: 20px;
 }
 
@@ -77,9 +77,9 @@ input,select {
 }
 
 .search-button-container {
-  display: flex;
-  justify-content: flex-start;
-  padding-left: 60px;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
 }
 
 .suggestion-option {
