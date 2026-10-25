@@ -46,6 +46,11 @@ input,select {
   text-align: left;
 }
 
+.search-submit {
+  position: relative;
+  z-index: 2;
+}
+
 .suggestion-option {
   display: block;
   width: 100%;

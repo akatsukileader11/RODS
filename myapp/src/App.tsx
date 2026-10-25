@@ -46,7 +46,7 @@ function App() {
   });
 
   const [name, setName] = useState("");
-  const [searchName, setSearchName] = useState("");
+  const [visibleGames, setVisibleGames] = useState(games);
   const [suggestionsOpen, setSuggestionsOpen] = useState(false);
 
   const gameNames = [...new Set(games.map((game) => game.name).filter(Boolean))]
@@ -57,15 +57,15 @@ function App() {
 
   function Display(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
-    setSearchName(name.trim());
+    const searchTerms = name.toLowerCase().match(/[a-z0-9]+/g) ?? [];
+    setVisibleGames(
+      games.filter((game) => {
+        const gameNameWords = new Set(game.name.toLowerCase().match(/[a-z0-9]+/g) ?? []);
+        return searchTerms.every((term) => gameNameWords.has(term));
+      })
+    );
     setSuggestionsOpen(false);
   }
-
-  const searchTerms = searchName.toLowerCase().split(/\s+/).filter(Boolean);
-  const visibleGames = games.filter((game) => {
-    const gameName = game.name.toLowerCase();
-    return searchTerms.every((term) => gameName.includes(term));
-  });
 
   //UI
   return (
@@ -115,7 +115,7 @@ function App() {
       </div>
       <br />
       <div>
-        <button type="submit">Search</button>
+        <button className="search-submit" type="submit">Search</button>
       </div>
       <br />
       <div className="table-container">
@@ -133,7 +133,7 @@ function App() {
           <tbody>
             {visibleGames.length > 0 ? (
               visibleGames.map((game) => (
-                <tr key={game.generation_id}>
+                <tr key={game.identifier}>
                   <td>{game.name}</td>
                   <td>{game.genre}</td>
                   <td>{game.developer}</td>

@@ -41,19 +41,18 @@ function App() {
 		return gameEntry;
 	});
 	const [name, setName] = useState("");
-	const [searchName, setSearchName] = useState("");
+	const [visibleGames, setVisibleGames] = useState(games);
 	const [suggestionsOpen, setSuggestionsOpen] = useState(false);
 	const matchingNames = [...new Set(games.map((game) => game.name).filter(Boolean))].sort((first, second) => first.localeCompare(second, void 0, { sensitivity: "base" })).filter((gameName) => gameName.toLowerCase().includes(name.trim().toLowerCase()));
 	function Display(event) {
 		event.preventDefault();
-		setSearchName(name.trim());
+		const searchTerms = name.toLowerCase().match(/[a-z0-9]+/g) ?? [];
+		setVisibleGames(games.filter((game) => {
+			const gameNameWords = new Set(game.name.toLowerCase().match(/[a-z0-9]+/g) ?? []);
+			return searchTerms.every((term) => gameNameWords.has(term));
+		}));
 		setSuggestionsOpen(false);
 	}
-	const searchTerms = searchName.toLowerCase().split(/\s+/).filter(Boolean);
-	const visibleGames = games.filter((game) => {
-		const gameName = game.name.toLowerCase();
-		return searchTerms.every((term) => gameName.includes(term));
-	});
 	return /* @__PURE__ */ jsxs("form", {
 		onSubmit: Display,
 		children: [
@@ -98,6 +97,7 @@ function App() {
 			})] }),
 			/* @__PURE__ */ jsx("br", {}),
 			/* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsx("button", {
+				className: "search-submit",
 				type: "submit",
 				children: "Search"
 			}) }),
@@ -118,7 +118,7 @@ function App() {
 					/* @__PURE__ */ jsx("td", { children: game.publisher }),
 					/* @__PURE__ */ jsx("td", { children: game.game_type }),
 					/* @__PURE__ */ jsx("td", { children: game.platforms })
-				] }, game.generation_id)) : /* @__PURE__ */ jsx("tr", { children: /* @__PURE__ */ jsx("td", {
+				] }, game.identifier)) : /* @__PURE__ */ jsx("tr", { children: /* @__PURE__ */ jsx("td", {
 					colSpan: 6,
 					children: "No games found."
 				}) }) })] })
