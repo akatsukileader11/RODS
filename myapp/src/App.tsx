@@ -6,6 +6,7 @@ import "./App.css"; //Use our style file
 import gameDexLogo from "./GameDex app logo.png";
 import csvText from "./data_export_games_csv_comma.csv?raw";
 import platformCsvText from "./data_export_game_platforms_csv_comma.csv?raw";
+import gameImagesCsvText from "./gamedex_games_with_images.csv?raw";
 
 
 function App() {
@@ -18,6 +19,15 @@ function App() {
     platformCsvText,
     {header: true, skipEmptyLines: true}
   ).data;
+  const gameImageRows = Papa.parse<GameImageRow>(
+    gameImagesCsvText,
+    {header: true, skipEmptyLines: true}
+  ).data;
+  const imageUrlsByGame = new Map(
+    gameImageRows
+      .filter((row) => row.identifier && row.box_art_image_url)
+      .map((row) => [row.identifier!, row.box_art_image_url!])
+  );
   const platformsByGame = new Map<string, string[]>();
   platformRows.forEach((row) => {
     if (!row.game_identifier || !row.platform_identifier) {
@@ -43,6 +53,7 @@ function App() {
     gameEntry.box_art_image_path = row.box_art_image_path ?? "";
     gameEntry.name = row.name ?? "";
     gameEntry.platforms = platformsByGame.get(gameEntry.identifier)?.join(", ") ?? "";
+    gameEntry.boxArtImageUrl = imageUrlsByGame.get(gameEntry.identifier) ?? "";
     return gameEntry;
   });
 
@@ -144,7 +155,17 @@ function App() {
             {visibleGames.length > 0 ? (
               visibleGames.map((game) => (
                 <tr key={game.identifier}>
-                  <td>{game.name}</td>
+                  <td>
+                    {game.boxArtImageUrl && (
+                      <img
+                        className="game-box-art"
+                        src={game.boxArtImageUrl}
+                        alt={`${game.name} box art`}
+                        loading="lazy"
+                      />
+                    )}
+                    {game.name}
+                  </td>
                   <td>{game.genre}</td>
                   <td>{game.developer}</td>
                   <td>{game.publisher}</td>
@@ -180,9 +201,15 @@ class Game {
   box_art_image_path!: string;
   name!: string;
   platforms!: string;
+  boxArtImageUrl!: string;
 }
 
 type PlatformRow = {
   game_identifier?: string;
   platform_identifier?: string;
+};
+
+type GameImageRow = {
+  identifier?: string;
+  box_art_image_url?: string;
 };

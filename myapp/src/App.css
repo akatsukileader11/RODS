@@ -19,11 +19,19 @@ button:focus-visible {
 }
 
 input,select {
-  padding: 5px;
+  padding: 8px;
   margin: 5px;
 
   border: 1px solid silver;
   border-radius: 10px;
+}
+
+#name {
+  font-size: 20px;
+}
+
+.search-controls label {
+  font-size: 20px;
 }
 
 .search-input-container {
@@ -33,7 +41,7 @@ input,select {
 
 .app-logo {
   display: block;
-  width: 220px;
+  width: 190px;
   max-width: 70%;
   height: auto;
   margin: 16px auto 20px;
@@ -64,8 +72,8 @@ input,select {
 .search-submit {
   position: relative;
   z-index: 2;
-  padding: 1px 3px;
-  font-size: 15px;
+  padding: 4px 8px;
+  font-size: 18px;
 }
 
 .search-button-container {
@@ -110,6 +118,14 @@ table {
   width: 100%;
   border-collapse: collapse;
   color: #111;
+}
+
+.game-box-art {
+  display: block;
+  width: 120px;
+  height: 165px;
+  margin: 0 auto 8px;
+  object-fit: contain;
 }
 
 th,
