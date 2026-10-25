@@ -70,52 +70,60 @@ function App() {
   //UI
   return (
     <form onSubmit={Display}>
-      <div>
-        <label htmlFor="name">Search games by name: </label>
-        <div className="search-input-container">
-          <input
-            id="name"
-            value={name}
-            autoComplete="off"
-            aria-autocomplete="list"
-            aria-controls="game-name-suggestions"
-            aria-expanded={suggestionsOpen}
-            onFocus={() => setSuggestionsOpen(true)}
-            onChange={(event) => {
-              setName(event.target.value);
-              setSuggestionsOpen(true);
-            }}
-            onBlur={() => setSuggestionsOpen(false)}
-          />
-          {suggestionsOpen && (
-            <div id="game-name-suggestions" className="suggestion-list" role="listbox">
-              {matchingNames.length > 0 ? (
-                matchingNames.map((gameName) => (
-                  <button
-                    key={gameName}
-                    type="button"
-                    className="suggestion-option"
-                    role="option"
-                    aria-selected={false}
-                    onMouseDown={(event) => event.preventDefault()}
-                    onClick={() => {
-                      setName(gameName);
-                      setSuggestionsOpen(false);
-                    }}
-                  >
-                    {gameName}
-                  </button>
-                ))
-              ) : (
-                <div className="no-suggestions">No matching games</div>
-              )}
-            </div>
-          )}
+      <div className="search-controls">
+        <div>
+          <label htmlFor="name">Search games by name: </label>
+          <div className="search-input-container">
+            <input
+              id="name"
+              value={name}
+              autoComplete="off"
+              aria-autocomplete="list"
+              aria-controls="game-name-suggestions"
+              aria-expanded={suggestionsOpen}
+              onFocus={() => setSuggestionsOpen(true)}
+              onChange={(event) => {
+                setName(event.target.value);
+                setSuggestionsOpen(true);
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && !event.nativeEvent.isComposing) {
+                  event.preventDefault();
+                  event.currentTarget.form?.requestSubmit();
+                }
+              }}
+              onBlur={() => setSuggestionsOpen(false)}
+            />
+            {suggestionsOpen && (
+              <div id="game-name-suggestions" className="suggestion-list" role="listbox">
+                {matchingNames.length > 0 ? (
+                  matchingNames.map((gameName) => (
+                    <button
+                      key={gameName}
+                      type="button"
+                      className="suggestion-option"
+                      role="option"
+                      aria-selected={false}
+                      onMouseDown={(event) => event.preventDefault()}
+                      onClick={() => {
+                        setName(gameName);
+                        setSuggestionsOpen(false);
+                      }}
+                    >
+                      {gameName}
+                    </button>
+                  ))
+                ) : (
+                  <div className="no-suggestions">No matching games</div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-      <br />
-      <div>
-        <button className="search-submit" type="submit">Search</button>
+        <br />
+        <div className="search-button-container">
+          <button className="search-submit" type="submit">Search</button>
+        </div>
       </div>
       <br />
       <div className="table-container">

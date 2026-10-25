@@ -31,6 +31,13 @@ input,select {
   display: inline-block;
 }
 
+.search-controls {
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+  text-align: left;
+}
+
 .suggestion-list {
   position: absolute;
   z-index: 1;
@@ -49,6 +56,14 @@ input,select {
 .search-submit {
   position: relative;
   z-index: 2;
+  padding: 1px 3px;
+  font-size: 15px;
+}
+
+.search-button-container {
+  display: flex;
+  justify-content: flex-start;
+  padding-left: 60px;
 }
 
 .suggestion-option {
@@ -92,7 +107,7 @@ table {
 th,
 td {
   padding: 12px 14px;
-  border-bottom: 1px solid #e8e8e8;
+  border-bottom: 2px solid #e8e8e8;
   text-align: center;
 }
 

@@ -56,51 +56,65 @@ function App() {
 	return /* @__PURE__ */ jsxs("form", {
 		onSubmit: Display,
 		children: [
-			/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
-				htmlFor: "name",
-				children: "Search games by name: "
-			}), /* @__PURE__ */ jsxs("div", {
-				className: "search-input-container",
-				children: [/* @__PURE__ */ jsx("input", {
-					id: "name",
-					value: name,
-					autoComplete: "off",
-					"aria-autocomplete": "list",
-					"aria-controls": "game-name-suggestions",
-					"aria-expanded": suggestionsOpen,
-					onFocus: () => setSuggestionsOpen(true),
-					onChange: (event) => {
-						setName(event.target.value);
-						setSuggestionsOpen(true);
-					},
-					onBlur: () => setSuggestionsOpen(false)
-				}), suggestionsOpen && /* @__PURE__ */ jsx("div", {
-					id: "game-name-suggestions",
-					className: "suggestion-list",
-					role: "listbox",
-					children: matchingNames.length > 0 ? matchingNames.map((gameName) => /* @__PURE__ */ jsx("button", {
-						type: "button",
-						className: "suggestion-option",
-						role: "option",
-						"aria-selected": false,
-						onMouseDown: (event) => event.preventDefault(),
-						onClick: () => {
-							setName(gameName);
-							setSuggestionsOpen(false);
-						},
-						children: gameName
-					}, gameName)) : /* @__PURE__ */ jsx("div", {
-						className: "no-suggestions",
-						children: "No matching games"
+			/* @__PURE__ */ jsxs("div", {
+				className: "search-controls",
+				children: [
+					/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
+						htmlFor: "name",
+						children: "Search games by name: "
+					}), /* @__PURE__ */ jsxs("div", {
+						className: "search-input-container",
+						children: [/* @__PURE__ */ jsx("input", {
+							id: "name",
+							value: name,
+							autoComplete: "off",
+							"aria-autocomplete": "list",
+							"aria-controls": "game-name-suggestions",
+							"aria-expanded": suggestionsOpen,
+							onFocus: () => setSuggestionsOpen(true),
+							onChange: (event) => {
+								setName(event.target.value);
+								setSuggestionsOpen(true);
+							},
+							onKeyDown: (event) => {
+								if (event.key === "Enter" && !event.nativeEvent.isComposing) {
+									event.preventDefault();
+									event.currentTarget.form?.requestSubmit();
+								}
+							},
+							onBlur: () => setSuggestionsOpen(false)
+						}), suggestionsOpen && /* @__PURE__ */ jsx("div", {
+							id: "game-name-suggestions",
+							className: "suggestion-list",
+							role: "listbox",
+							children: matchingNames.length > 0 ? matchingNames.map((gameName) => /* @__PURE__ */ jsx("button", {
+								type: "button",
+								className: "suggestion-option",
+								role: "option",
+								"aria-selected": false,
+								onMouseDown: (event) => event.preventDefault(),
+								onClick: () => {
+									setName(gameName);
+									setSuggestionsOpen(false);
+								},
+								children: gameName
+							}, gameName)) : /* @__PURE__ */ jsx("div", {
+								className: "no-suggestions",
+								children: "No matching games"
+							})
+						})]
+					})] }),
+					/* @__PURE__ */ jsx("br", {}),
+					/* @__PURE__ */ jsx("div", {
+						className: "search-button-container",
+						children: /* @__PURE__ */ jsx("button", {
+							className: "search-submit",
+							type: "submit",
+							children: "Search"
+						})
 					})
-				})]
-			})] }),
-			/* @__PURE__ */ jsx("br", {}),
-			/* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsx("button", {
-				className: "search-submit",
-				type: "submit",
-				children: "Search"
-			}) }),
+				]
+			}),
 			/* @__PURE__ */ jsx("br", {}),
 			/* @__PURE__ */ jsx("div", {
 				className: "table-container",
