@@ -47,26 +47,71 @@ function App() {
 
   const [name, setName] = useState("");
   const [searchName, setSearchName] = useState("");
+  const [suggestionsOpen, setSuggestionsOpen] = useState(false);
+
+  const gameNames = [...new Set(games.map((game) => game.name).filter(Boolean))]
+    .sort((first, second) => first.localeCompare(second, undefined, { sensitivity: "base" }));
+  const matchingNames = gameNames.filter((gameName) =>
+    gameName.toLowerCase().includes(name.trim().toLowerCase())
+  );
 
   function Display(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
     setSearchName(name.trim());
+    setSuggestionsOpen(false);
   }
 
-  const visibleGames = games.filter((game) =>
-    game.name.toLowerCase().includes(searchName.toLowerCase())
-  );
+  const searchTerms = searchName.toLowerCase().split(/\s+/).filter(Boolean);
+  const visibleGames = games.filter((game) => {
+    const gameName = game.name.toLowerCase();
+    return searchTerms.every((term) => gameName.includes(term));
+  });
 
   //UI
   return (
     <form onSubmit={Display}>
       <div>
         <label htmlFor="name">Search games by name: </label>
-        <input
-          id="name"
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-        />
+        <div className="search-input-container">
+          <input
+            id="name"
+            value={name}
+            autoComplete="off"
+            aria-autocomplete="list"
+            aria-controls="game-name-suggestions"
+            aria-expanded={suggestionsOpen}
+            onFocus={() => setSuggestionsOpen(true)}
+            onChange={(event) => {
+              setName(event.target.value);
+              setSuggestionsOpen(true);
+            }}
+            onBlur={() => setSuggestionsOpen(false)}
+          />
+          {suggestionsOpen && (
+            <div id="game-name-suggestions" className="suggestion-list" role="listbox">
+              {matchingNames.length > 0 ? (
+                matchingNames.map((gameName) => (
+                  <button
+                    key={gameName}
+                    type="button"
+                    className="suggestion-option"
+                    role="option"
+                    aria-selected={false}
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => {
+                      setName(gameName);
+                      setSuggestionsOpen(false);
+                    }}
+                  >
+                    {gameName}
+                  </button>
+                ))
+              ) : (
+                <div className="no-suggestions">No matching games</div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
       <br />
       <div>
@@ -86,16 +131,22 @@ function App() {
             </tr>
           </thead>
           <tbody>
-            {visibleGames.map((game) => (
-              <tr key={game.generation_id}>
-                <td>{game.name}</td>
-                <td>{game.genre}</td>
-                <td>{game.developer}</td>
-                <td>{game.publisher}</td>
-                <td>{game.game_type}</td>
-                <td>{game.platforms}</td>
+            {visibleGames.length > 0 ? (
+              visibleGames.map((game) => (
+                <tr key={game.generation_id}>
+                  <td>{game.name}</td>
+                  <td>{game.genre}</td>
+                  <td>{game.developer}</td>
+                  <td>{game.publisher}</td>
+                  <td>{game.game_type}</td>
+                  <td>{game.platforms}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={6}>No games found.</td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

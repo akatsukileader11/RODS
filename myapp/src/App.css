@@ -26,6 +26,49 @@ input,select {
   border-radius: 10px;
 }
 
+.search-input-container {
+  position: relative;
+  display: inline-block;
+}
+
+.suggestion-list {
+  position: absolute;
+  z-index: 1;
+  top: 100%;
+  left: 5px;
+  right: 5px;
+  max-height: 240px;
+  overflow-y: auto;
+  border: 1px solid #d5d5d5;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 6px 16px rgb(0 0 0 / 16%);
+  text-align: left;
+}
+
+.suggestion-option {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 0;
+  background: #fff;
+  color: #111;
+  text-align: left;
+  cursor: pointer;
+}
+
+.suggestion-option:hover,
+.suggestion-option:focus-visible {
+  background: #f1f1f1;
+  color: #111;
+}
+
+.no-suggestions {
+  padding: 8px 12px;
+  color: #555;
+}
+
 .table-container {
   width: 100%;
   overflow-x: auto;

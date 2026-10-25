@@ -42,21 +42,59 @@ function App() {
 	});
 	const [name, setName] = useState("");
 	const [searchName, setSearchName] = useState("");
+	const [suggestionsOpen, setSuggestionsOpen] = useState(false);
+	const matchingNames = [...new Set(games.map((game) => game.name).filter(Boolean))].sort((first, second) => first.localeCompare(second, void 0, { sensitivity: "base" })).filter((gameName) => gameName.toLowerCase().includes(name.trim().toLowerCase()));
 	function Display(event) {
 		event.preventDefault();
 		setSearchName(name.trim());
+		setSuggestionsOpen(false);
 	}
-	const visibleGames = games.filter((game) => game.name.toLowerCase().includes(searchName.toLowerCase()));
+	const searchTerms = searchName.toLowerCase().split(/\s+/).filter(Boolean);
+	const visibleGames = games.filter((game) => {
+		const gameName = game.name.toLowerCase();
+		return searchTerms.every((term) => gameName.includes(term));
+	});
 	return /* @__PURE__ */ jsxs("form", {
 		onSubmit: Display,
 		children: [
 			/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
 				htmlFor: "name",
 				children: "Search games by name: "
-			}), /* @__PURE__ */ jsx("input", {
-				id: "name",
-				value: name,
-				onChange: (event) => setName(event.target.value)
+			}), /* @__PURE__ */ jsxs("div", {
+				className: "search-input-container",
+				children: [/* @__PURE__ */ jsx("input", {
+					id: "name",
+					value: name,
+					autoComplete: "off",
+					"aria-autocomplete": "list",
+					"aria-controls": "game-name-suggestions",
+					"aria-expanded": suggestionsOpen,
+					onFocus: () => setSuggestionsOpen(true),
+					onChange: (event) => {
+						setName(event.target.value);
+						setSuggestionsOpen(true);
+					},
+					onBlur: () => setSuggestionsOpen(false)
+				}), suggestionsOpen && /* @__PURE__ */ jsx("div", {
+					id: "game-name-suggestions",
+					className: "suggestion-list",
+					role: "listbox",
+					children: matchingNames.length > 0 ? matchingNames.map((gameName) => /* @__PURE__ */ jsx("button", {
+						type: "button",
+						className: "suggestion-option",
+						role: "option",
+						"aria-selected": false,
+						onMouseDown: (event) => event.preventDefault(),
+						onClick: () => {
+							setName(gameName);
+							setSuggestionsOpen(false);
+						},
+						children: gameName
+					}, gameName)) : /* @__PURE__ */ jsx("div", {
+						className: "no-suggestions",
+						children: "No matching games"
+					})
+				})]
 			})] }),
 			/* @__PURE__ */ jsx("br", {}),
 			/* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsx("button", {
@@ -73,14 +111,17 @@ function App() {
 					/* @__PURE__ */ jsx("th", { children: "Publisher" }),
 					/* @__PURE__ */ jsx("th", { children: "Game Type" }),
 					/* @__PURE__ */ jsx("th", { children: "Platforms" })
-				] }) }), /* @__PURE__ */ jsx("tbody", { children: visibleGames.map((game) => /* @__PURE__ */ jsxs("tr", { children: [
+				] }) }), /* @__PURE__ */ jsx("tbody", { children: visibleGames.length > 0 ? visibleGames.map((game) => /* @__PURE__ */ jsxs("tr", { children: [
 					/* @__PURE__ */ jsx("td", { children: game.name }),
 					/* @__PURE__ */ jsx("td", { children: game.genre }),
 					/* @__PURE__ */ jsx("td", { children: game.developer }),
 					/* @__PURE__ */ jsx("td", { children: game.publisher }),
 					/* @__PURE__ */ jsx("td", { children: game.game_type }),
 					/* @__PURE__ */ jsx("td", { children: game.platforms })
-				] }, game.generation_id)) })] })
+				] }, game.generation_id)) : /* @__PURE__ */ jsx("tr", { children: /* @__PURE__ */ jsx("td", {
+					colSpan: 6,
+					children: "No games found."
+				}) }) })] })
 			})
 		]
 	});
